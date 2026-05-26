@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vito.nosql.domain.Comment;
 import com.vito.nosql.domain.Post;
 import com.vito.nosql.domain.User;
 import com.vito.nosql.dto.AuthorDTO;
+import com.vito.nosql.dto.CommentDTO;
 import com.vito.nosql.dto.PostDTO;
 import com.vito.nosql.repositories.PostRepository;
 import com.vito.nosql.repositories.UserRepository;
@@ -53,6 +55,24 @@ public class PostService {
 		repo.deleteById(id);
 	}
 	
+	public Comment insertComment(String id, Comment obj) {
+		Post post = findById(id);
+		
+		post.getComments().add(obj);
+		
+		repo.save(post);
+		
+		return obj;
+	}
+	
+	public void deleteComment(String postId, String commentId) {
+		Post post = findById(postId);
+		
+		post.getComments().removeIf(p -> p.getId().equals(commentId));
+		
+		repo.save(post);
+	}
+	
 	public List<Post> findAll(){
 		return repo.findAll();
 	}
@@ -76,9 +96,15 @@ public class PostService {
 	}
 	
 	public Post fromDTO(PostDTO objDto) {
-		User user = userRepo.findById(objDto.getAuthorId()).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));;
+		User user = userRepo.findById(objDto.getAuthorId()).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
 		
 		return new Post(null, new Date(), objDto.getTitle(), objDto.getBody(), new AuthorDTO(user));
+	}
+	
+	public Comment fromDto(CommentDTO objDto) {
+		User user = userRepo.findById(objDto.getAuthorId()).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
+		
+		return new Comment(null, objDto.getText(), new Date(), new AuthorDTO(user));
 	}
 
 }

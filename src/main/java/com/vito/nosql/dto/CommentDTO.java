@@ -1,23 +1,20 @@
 package com.vito.nosql.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class CommentDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String text;
-	private Date date;
-	private AuthorDTO author;
+	private String authorId;
 	
 	public CommentDTO() {
 	}
 
-	public CommentDTO(String text, Date date, AuthorDTO author) {
+	public CommentDTO(String text, String authorId) {
 		this.text = text;
-		this.date = date;
-		this.author = author;
+		this.authorId = authorId;
 	}
 
 	public String getText() {
@@ -28,20 +25,12 @@ public class CommentDTO implements Serializable {
 		this.text = text;
 	}
 
-	public Date getDate() {
-		return date;
+	public String getAuthorId() {
+		return authorId;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public AuthorDTO getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(AuthorDTO author) {
-		this.author = author;
+	public void setAuthorId(String authorId) {
+		this.authorId = authorId;
 	}
 	
 }

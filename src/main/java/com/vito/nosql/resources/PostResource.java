@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.vito.nosql.domain.Comment;
 import com.vito.nosql.domain.Post;
+import com.vito.nosql.dto.CommentDTO;
 import com.vito.nosql.dto.PostDTO;
 import com.vito.nosql.resources.util.URL;
 import com.vito.nosql.services.PostService;
@@ -64,6 +66,22 @@ public class PostResource {
 		
 		URI uri	= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.getId()).toUri();
 		return ResponseEntity.created(uri).build();
+	}
+	
+	@PostMapping(value = "/{id}/comments")
+	public ResponseEntity<Comment> insertComment(@PathVariable String id, @RequestBody CommentDTO objDto){
+		Comment comment = service.fromDto(objDto);
+		
+		comment = service.insertComment(id, comment);
+		
+		URI uri	= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(comment.getId()).toUri();
+		return ResponseEntity.created(uri).build();
+	}
+	
+	@DeleteMapping(value = "/{postId}/comments/{commentId}")
+	public ResponseEntity<Void> deleteComment(@PathVariable String postId, @PathVariable String commentId){
+		service.deleteComment(postId, commentId);
+		return ResponseEntity.noContent().build();
 	}
 	
 	@DeleteMapping(value = "/{id}")
