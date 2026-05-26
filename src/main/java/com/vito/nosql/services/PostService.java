@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.vito.nosql.domain.Post;
 import com.vito.nosql.domain.User;
+import com.vito.nosql.dto.AuthorDTO;
+import com.vito.nosql.dto.PostDTO;
 import com.vito.nosql.repositories.PostRepository;
 import com.vito.nosql.repositories.UserRepository;
 import com.vito.nosql.services.exceptions.ObjectNotFoundException;
@@ -23,7 +25,18 @@ public class PostService {
 	private UserRepository userRepo;
 	
 	public Post insert(Post obj) {
-		return repo.insert(obj);
+		Post savedPost = repo.save(obj);
+
+	    User user = userRepo.findById(savedPost.getAuthor().getId())
+	            .orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));
+
+	    savedPost = repo.findById(savedPost.getId()).get();
+
+	    user.getPosts().add(savedPost);
+
+	    userRepo.save(user);
+
+	    return savedPost;
 	}
 	
 	public void delete(String id) {
@@ -31,13 +44,13 @@ public class PostService {
 		
 		String authorId = post.getAuthor().getId();
 		
-		repo.deleteById(id);
-		
 		User user = userRepo.findById(authorId).orElseThrow(() -> new ObjectNotFoundException("Autor não encontrado"));
 		
 		user.getPosts().removeIf(p -> p.getId().equals(id));
 		
 		userRepo.save(user);
+		
+		repo.deleteById(id);
 	}
 	
 	public List<Post> findAll(){
@@ -60,6 +73,12 @@ public class PostService {
 	public List<Post> fullSearch(String text, Date minDate, Date maxDate){
 		maxDate = new Date(maxDate.getTime() + 24*60*60*1000);
 		return repo.fullSearch(text, minDate, maxDate);
+	}
+	
+	public Post fromDTO(PostDTO objDto) {
+		User user = userRepo.findById(objDto.getAuthorId()).orElseThrow(() -> new ObjectNotFoundException("Usuário não encontrado"));;
+		
+		return new Post(null, new Date(), objDto.getTitle(), objDto.getBody(), new AuthorDTO(user));
 	}
 
 }

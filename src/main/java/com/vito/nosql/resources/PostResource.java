@@ -1,5 +1,6 @@
 package com.vito.nosql.resources;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -8,11 +9,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.vito.nosql.domain.Post;
+import com.vito.nosql.dto.PostDTO;
 import com.vito.nosql.resources.util.URL;
 import com.vito.nosql.services.PostService;
 
@@ -50,6 +55,15 @@ public class PostResource {
 		Date max = URL.convertDate(maxDate, new Date());
 		List<Post> list = service.fullSearch(text, min, max);
 		return ResponseEntity.ok().body(list);
+	}
+	
+	@PostMapping()
+	public ResponseEntity<Void> insert(@RequestBody PostDTO objDto){
+		Post post = service.fromDTO(objDto);
+		post = service.insert(post);
+		
+		URI uri	= ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(post.getId()).toUri();
+		return ResponseEntity.created(uri).build();
 	}
 	
 	@DeleteMapping(value = "/{id}")
