@@ -68,6 +68,18 @@ public class PostResource {
 		return ResponseEntity.created(uri).build();
 	}
 	
+	
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<Void> delete(@PathVariable String id){
+		service.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping(value = "/{id}/comments")
+	public ResponseEntity<List<Comment>> findAllComments(@PathVariable String id){
+		return ResponseEntity.ok().body(service.findAll(id));
+	}
+	
 	@PostMapping(value = "/{id}/comments")
 	public ResponseEntity<Comment> insertComment(@PathVariable String id, @RequestBody CommentDTO objDto){
 		Comment comment = service.fromDto(objDto);
@@ -81,12 +93,6 @@ public class PostResource {
 	@DeleteMapping(value = "/{postId}/comments/{commentId}")
 	public ResponseEntity<Void> deleteComment(@PathVariable String postId, @PathVariable String commentId){
 		service.deleteComment(postId, commentId);
-		return ResponseEntity.noContent().build();
-	}
-	
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Void> delete(@PathVariable String id){
-		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
 

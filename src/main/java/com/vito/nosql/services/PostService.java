@@ -76,6 +76,11 @@ public class PostService {
 	public List<Post> findAll(){
 		return repo.findAll();
 	}
+	
+	public List<Comment> findAll(String postId){
+		Post post = findById(postId);
+		return post.getComments();
+	}
 
 	public Post findById(String id) {
 		Optional<Post> obj = repo.findById(id);
